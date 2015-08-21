@@ -49,18 +49,30 @@ paint_mode = 1
 #brush color
 last_color = 0
 brush_color = 2
+#colors:
+# 0 = LED off
+# 1 = red
+# 2 = green
+# 3 = yellow
+# 4 = blue
+# 5 = purple
+# 6 = white
 
 #for comparing points from touch screen
 temp_point = ['0', '0', '0']
 
+#screen config
 screen = [[0 for x in xrange(32)] for x in xrange(16)]
 
 #=================================
 #   set up serial input
 #=================================
-arduino_data = serial.Serial('/dev/ttyACM0', 9600)
+#this is the USB port the arduino is connected to on the pi
+serial_port = '/dev/ttyACM0';
+arduino_data = serial.Serial(serial_port, 9600)
 #arduino_data.open()
 #arduino_data.write("testing...")
+#arduino_data.flush()
 
 #=================================
 #   set pins to output
@@ -165,7 +177,9 @@ def set_pixel(x, y, color):
 #   LED Matrix
 #---------------------------------
 ####################################
-#the turn off/on doesn't really work
+#the turn off/on doesn't really work because I'd need 4amps but only get 2 from the power cable
+
+"""
 def turn_on_leds_in_matrix():
     for x in range(16):
         for y in range(32):
@@ -177,17 +191,22 @@ def turn_off_leds_in_matrix():
         for y in range(32):
             set_pixel(x, y, 0)
     refresh()
+"""
 ######################################
 def blinkLED(x, y, color):
     set_pixel(x, y, color)
     refresh()
+    #time.sleep(delay)
     set_pixel(x, y, 0)
+    refesh()
 
 def rainbow_intro_slider():
+    #start from red
     color = 1
 
+    #turn on LEDs
     for x in range(16):
-
+        #clycle through colors
         if(color == 7):
             color = 1
         else:
@@ -205,13 +224,14 @@ def rainbow_intro_slider():
             #set_pixel(x, y, 0)
             #refresh()
             
-    #turn off
+    #turn off LEDs
     for x in reversed(xrange(16)):
         for y in reversed(xrange(32)):
             set_pixel(x, y, 0)
             refresh()
 
 def rainbow_slider(color=3):
+    #color is yellow by default
     for x in range(16):
         #print "color: " +str(color)
         #print "x: " + str(x)
@@ -227,18 +247,20 @@ def rainbow_slider(color=3):
             set_pixel(x, y, 0)
             refresh()
 
+#check if two points are different
 def is_new_point(old_point, new_point):
     if(old_point[0] == new_point[0] and old_point[1] == new_point[1]):
         return False
     return True
-    
+
+#check if the pressure is 0
 def is_pressure_zero(point):
     if(point[2] == 0):
         return True
     return False
 
 #---------------------------------
-#   Buttons
+#   Button functions
 #---------------------------------
 def resetMatrix(channel):
     if(GPIO.input(reset_btn)):
@@ -259,7 +281,7 @@ def changeBrushColor(channel):
             
         print "brush color changed! color now: " + str(brush_color)
     else:
-        print "currently in erase mode"
+        print "currently in erase mode. the brush color is 0"
     
 
 def changePaintMode(channel):
@@ -284,42 +306,64 @@ def changePaintMode(channel):
 #=================================
 #   interrupts
 #=================================
+#reset interrupt
 GPIO.add_event_detect(reset_btn, GPIO.RISING, callback=resetMatrix)
+#toggle mode interrupt
 GPIO.add_event_detect(erase_toggle_btn, GPIO.RISING, callback=changePaintMode)
+#set brush color interrupt
 GPIO.add_event_detect(color_set_btn, GPIO.RISING, callback=changeBrushColor)
 
-#--------------------------------
+
+#=================================
+#   program
+#=================================
+# should later break this up into a main function
+#---------------------------------
 # should I make this an interrupt too? how?
-#--------------------------------
+
+# - threads
+#       - thread 1 continuously refreshes the Matrix
+#       - thread 2 reads seriala input and sets pixels
+#---------------------------------
+
+#rainbow_intro_slider()
+#refresh()
+
 while True:
-    #rainbow_intro_slider()
-    #refresh()
-    
     try:
         #blinkLED(15, 31, 3)
         #refresh()
         while (arduino_data.inWaiting() == 0 ):
              #if there is no data input don't do anything
             pass
-
-        coordinates = arduino_data.readline()   #get the line from serial port
+        
+        #get the line from serial port
+        coordinates = arduino_data.readline()
+        #get rid of the retrn and new line at the end of the string
         coordinates = coordinates.rstrip("\r\n")
-        point = coordinates.split(",")          #split input into x, y, z
-
+        #split input into x, y, z
+        point = coordinates.split(",")
+        
+        #check to see if the new pont is the same as the last point
         if(not is_new_point(temp_point, point)):
             #print "same point"
             pass
         else:
             print "temp: ", temp_point
             print "point: ", point
-            print "different point"
+            #print "different point"
             print "---------------"
+            
+            #set the last point as to temp so we can compare the points later
             temp_point[0] = point[0]
             temp_point[1] = point[1]
             temp_point[2] = point[2]
-            point_x = int(point[0])                 #get x coordinate
-            point_y = int(point[1])                 #get y coordiante
-            point_z = int(point[2])                 #get pressure
+            
+            #get x, y (corridinates) & z (pressure) as ints
+            point_x = int(point[0])
+            point_y = int(point[1])
+            point_z = int(point[2])
+            
             set_pixel(point_y, point_x, brush_color)
             #refresh()
 
@@ -330,5 +374,6 @@ while True:
         
     refresh()
     
+#close stream
 arduino_data.close()
 GPIO.cleanup()
