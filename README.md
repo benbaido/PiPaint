@@ -3,6 +3,9 @@ Pi project for Pi class
 
 The user will be able to touch pad and draw on the LED display. They will be able to choose the size of the pen or brush and erase the display by pressing buttons. Since it’s a resistive touch pad the user will be able to use either their finger or a stylus to draw.
 
+Users the draw on the LED Matrix using the touchscreen overlay.
+Users are able to draw change the color of the LEDs that light up, reset the screen and 
+
 The target audience of this project are people who like to draw or doodle, people who like pixel art and kids.
 
 ###Materials:
@@ -37,6 +40,25 @@ The datasheet Adafruit provides for the board it outdated and doesn't have the r
 
 To connect it to the arduino, just follow the instructions in the library's example code.
 
+##Files
+###pipaint_two.py
+This is the program to run on the pi. It sets up the LED Matrix, sets up serial communication to the Arduino so the Pi can get the touch data. 
+
+###testarduino.py
+This is to test the serial connection beteen the pi and the Arduino. It's not part of the program.
+
+###TouchTest_adaex.ino
+This is the file to uplaod into the arduino. It gets the touch data from the touchscreen overlay and inputs the data to the serial screen as x, y, and z, seperated by a comma.
+
+For the pi to read the serial input correctly the serial monitor has to be closed on the Arduino side. If the serial monitor is up some inputs won't be transfered and some won't. The data transfered won't be complete.
+
+##Issues
+LED Matrix
+
+For some reason only row of LEDs will continuously light up and at the right brightness. The other LEDs are dim and will only light up when there's currently touch input streaming in. Could use threading to try to solve this problem.
+
+While presenting the project colors other than red and a very dim green wouldn't show up even though they did during testing (maybe I just put the matrix pin to the wrong pins on the pi)
+
 ##Prior Art
 
 *LED touchpad Sketch*
@@ -54,6 +76,14 @@ I didn't know about this before starting proposing my project but a group of Cor
 ##License
 GNU General Public License v2.0
 
+//put link to GNU lisence here
+
 ####Hzeller rpi-rgb-led-Matrix
+This library is under the GNU General Public License v2.0.
+
 I didn't change anything the library. I just added more classes of my own.
+
+####Adafruit's STMPE610
+This library is under the MIT license.
+//Adafruit's little blurb
 
