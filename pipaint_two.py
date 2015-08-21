@@ -320,8 +320,8 @@ GPIO.add_event_detect(color_set_btn, GPIO.RISING, callback=changeBrushColor)
 # should later break this up into a main function
 #---------------------------------
 # should I make this an interrupt too? how?
-
-# - threads
+#
+# - threads?
 #       - thread 1 continuously refreshes the Matrix
 #       - thread 2 reads seriala input and sets pixels
 #---------------------------------
