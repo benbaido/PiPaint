@@ -75,8 +75,7 @@ I didn't know about this before starting proposing my project but a group of Cor
 
 ##License
 GNU General Public License v2.0
-
-//put link to GNU lisence here
+[http://www.gnu.org/licenses/gpl-2.0.txt]](http://www.gnu.org/licenses/gpl-2.0.txt)
 
 ####Hzeller rpi-rgb-led-Matrix
 This library is under the GNU General Public License v2.0.
@@ -85,5 +84,4 @@ I didn't change anything the library. I just added more classes of my own.
 
 ####Adafruit's STMPE610
 This library is under the MIT license.
-//Adafruit's little blurb
 
