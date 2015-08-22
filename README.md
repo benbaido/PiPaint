@@ -73,7 +73,7 @@ I didn't know about this before starting proposing my project but a group of Cor
 
 ##License
 GNU General Public License v2.0
-[http://www.gnu.org/licenses/gpl-2.0.txt]](http://www.gnu.org/licenses/gpl-2.0.txt)
+[http://www.gnu.org/licenses/gpl-2.0.txt](http://www.gnu.org/licenses/gpl-2.0.txt)
 
 ####Hzeller rpi-rgb-led-Matrix
 This library is under the GNU General Public License v2.0.
